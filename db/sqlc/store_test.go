@@ -13,15 +13,14 @@ func TestTransferTx(t *testing.T) {
 
 	account1 := createRandomAccount(t)
 	account2 := createRandomAccount(t)
-	fmt.Println(">> before:", account1.Balance, account2.Balance, account1.ID, account2.ID)
 
+	// run a concurrent transfer
 	n := 5
 	amount := int64(10)
 
 	errs := make(chan error)
 	results := make(chan TransferTxResult)
 
-	// run n concurrent transfer transaction
 	for i := 0; i < n; i++ {
 		go func() {
 			result, err := store.TransferTx(context.Background(), TransferTxParams{
@@ -35,13 +34,11 @@ func TestTransferTx(t *testing.T) {
 		}()
 	}
 
-	// check results
 	existed := make(map[int]bool)
 
 	for i := 0; i < n; i++ {
 		err := <-errs
 		require.NoError(t, err)
-
 		result := <-results
 		require.NotEmpty(t, result)
 
@@ -80,6 +77,7 @@ func TestTransferTx(t *testing.T) {
 
 		// check accounts
 		fromAccount := result.FromAccount
+		fmt.Printf("account1 ID: %d, account2 ID: %d, fromAccount ID: %d\n", account1.ID, account2.ID, fromAccount.ID)
 		require.NotEmpty(t, fromAccount)
 		require.Equal(t, fromAccount.ID, account1.ID)
 
