@@ -7,7 +7,7 @@ import (
 
 const alphabet = "abcedifghijklmnopqrstuvwxyz"
 
-func RandomInt(max, min int64) int64 {
+func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }
 
