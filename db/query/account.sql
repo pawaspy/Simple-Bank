@@ -38,10 +38,3 @@ RETURNING *;
 -- name: DeleteAccount :exec
 DELETE FROM accounts
 WHERE id = $1;
-
--- name: ListOfAccounts :many
-SELECT id, owner, balance, currency, created_at
-FROM accounts
-ORDER BY id
-LIMIT $1
-OFFSET $2;
