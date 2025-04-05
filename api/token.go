@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	//db "github.com/pawaspy/simple_bank/db/sqlc"
 )
 
 type renewAccessTokenRequest struct {
@@ -26,7 +27,7 @@ func (server *Server) renewAccessToken(ctx *gin.Context) {
 	}
 
 	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
