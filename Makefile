@@ -3,6 +3,9 @@ DB_URL = postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable
 postgres:
 	docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
 
+stop:
+	docker stop postgres
+
 createdb:
 	docker exec -it postgres12 createdb --username=root --owner=root simple_bank
 
@@ -48,4 +51,4 @@ evans:
 	evans --host localhost --port 9090 --package pb --service SimpleBank -r repl
 
 
-.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlc test server mock db_docs db_schema proto evans
+.PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlc test server mock db_docs db_schema proto evans stop
