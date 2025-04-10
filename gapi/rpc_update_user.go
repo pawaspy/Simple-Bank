@@ -39,6 +39,8 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 			Valid: true,
 		}
 	}
+
+	return res, nil
 }
 
 func validateUpdateUserRequest(req *pb.UpdateUserRequest) (violation []*errdetails.BadRequest_FieldViolation) {
