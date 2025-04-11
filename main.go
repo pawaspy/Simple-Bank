@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
+	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
@@ -25,6 +28,10 @@ func main() {
 
 	if err != nil {
 		log.Info().Msg("Cannot open the config file")
+	}
+
+	if config.Environment == "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
