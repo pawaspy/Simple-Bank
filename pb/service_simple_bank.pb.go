@@ -33,7 +33,7 @@ const file_service_simple_bank_proto_rawDesc = "" +
 	"CreateUser\x12\x15.pb.CreateUserRequest\x1a\x16.pb.CreateUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/create_user\x12S\n" +
 	"\tLoginUser\x12\x14.pb.LoginUserRequest\x1a\x15.pb.LoginUserResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/login_user\x12W\n" +
 	"\n" +
-	"UpdateUser\x12\x15.pb.UpdateUserRequest\x1a\x16.pb.UpdateUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/update_userB\x81\x01\x92A[\x12Y\n" +
+	"UpdateUser\x12\x15.pb.UpdateUserRequest\x1a\x16.pb.UpdateUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*2\x0f/v1/update_userB\x81\x01\x92A[\x12Y\n" +
 	"\x0fSimple Bank API\"A\n" +
 	"\fPawas Pandey\x12\x1ahttps://github.com/pawaspy\x1a\x15pawaspy2633@gmail.com2\x031.2Z!github.com/pawaspy/simple_bank/pbb\x06proto3"
 

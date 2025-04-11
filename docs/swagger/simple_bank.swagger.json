@@ -86,7 +86,7 @@
       }
     },
     "/v1/update_user": {
-      "post": {
+      "patch": {
         "operationId": "SimpleBank_UpdateUser",
         "responses": {
           "200": {
