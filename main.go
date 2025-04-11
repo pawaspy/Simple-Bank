@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
+	"github.com/rs/zerolog/log"
 	"net"
 	"net/http"
 
@@ -24,13 +24,13 @@ func main() {
 	config, err := util.LoadConfig(".")
 
 	if err != nil {
-		log.Fatal("Cannot open the config file")
+		log.Info().Msg("Cannot open the config file")
 	}
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 
 	if err != nil {
-		log.Fatal("Cannot connect to db: ", err)
+		log.Info().Msg("Cannot connect to db: ")
 	}
 
 	store := db.NewStore(conn)
@@ -41,29 +41,31 @@ func main() {
 func runGrpcServer(config util.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create server")
+		log.Info().Msg("cannot create server")
 	}
 
-	grpcServer := grpc.NewServer()
+	logger := grpc.UnaryInterceptor(gapi.GrpcLogger)
+
+	grpcServer := grpc.NewServer(logger)
 	pb.RegisterSimpleBankServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", config.GRPCAddress)
 	if err != nil {
-		log.Fatal("cannot create listener")
+		log.Info().Msg("cannot create listener")
 	}
-	log.Printf("start gRPC server at %s", listener.Addr().String())
+	log.Info().Msgf("start gRPC server at %s", listener.Addr().String())
 
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatal("cannot start the server: ", err)
+		log.Info().Msg("cannot start the server: ")
 	}
 }
 
 func runGatewayServer(config util.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create server: ", err)
+		log.Info().Msg("cannot create server: ")
 	}
 
 	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
@@ -81,7 +83,7 @@ func runGatewayServer(config util.Config, store db.Store) {
 
 	err = pb.RegisterSimpleBankHandlerServer(ctx, grpcMux, server)
 	if err != nil {
-		log.Fatal("cannot register handler server: ", err)
+		log.Info().Msg("cannot register handler server: ")
 	}
 
 	mux := http.NewServeMux()
@@ -92,13 +94,13 @@ func runGatewayServer(config util.Config, store db.Store) {
 
 	listener, err := net.Listen("tcp", config.HTTPAddress)
 	if err != nil {
-		log.Fatal("cannot create listener: ", err)
+		log.Info().Msg("cannot create listener: ")
 	}
-	log.Printf("start HTTP server at %s", listener.Addr().String())
+	log.Info().Msgf("start HTTP server at %s", listener.Addr().String())
 
 	err = http.Serve(listener, mux)
 	if err != nil {
-		log.Fatal("cannot start the server: ", err)
+		log.Info().Msg("cannot start the server: ")
 	}
 }
 
@@ -106,11 +108,11 @@ func runGinServer(config util.Config, store db.Store) {
 	server, err := api.NewServer(config, store)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Info().Msg("cannot start server")
 	}
 
 	err = server.Start(config.HTTPAddress)
 	if err != nil {
-		log.Fatal("Cannot start the server")
+		log.Info().Msg("Cannot start the server")
 	}
 }
