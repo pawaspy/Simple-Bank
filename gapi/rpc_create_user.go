@@ -26,14 +26,28 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "cannot hash password: %s", err)
 	}
 
-	arg := db.CreateUserParams{
-		Username:       req.GetUsername(),
-		HashedPassword: hashedPassword,
-		Email:          req.GetEmail(),
-		FullName:       req.GetFullName(),
+	arg := db.CreateUserTxParams{
+		CreateUserParams: db.CreateUserParams{
+			Username:       req.GetUsername(),
+			HashedPassword: hashedPassword,
+			Email:          req.GetEmail(),
+			FullName:       req.GetFullName(),
+		},
+		AfterCreate: func(user db.User) error {
+			opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+
+			taskPayload := &worker.PayloadVerifyEmail{
+				Username: user.Username,
+			}
+			return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
+		},
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	txResult, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
@@ -44,41 +58,27 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		}
 	}
 
-	opts := []asynq.Option{
-		asynq.MaxRetry(10),
-		asynq.ProcessIn(10 * time.Second),
-		asynq.Queue(worker.QueueCritical),
-	}
-
-	taskPayload := &worker.PayloadVerifyEmail{
-		Username: user.Username,
-	}
-	err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
-	if err != nil{
-		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
-	}
-
 	rsp := &pb.CreateUserResponse{
-		User: convertor(user),
+		User: convertor(txResult.User),
 	}
 	return rsp, nil
 }
 
 func validatorACreateUserRequest(req *pb.CreateUserRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err :=  val.ValidateUsername(req.GetUsername()); err != nil {
-		violations = append(violations, fieldViolation("username", err)) 
+	if err := val.ValidateUsername(req.GetUsername()); err != nil {
+		violations = append(violations, fieldViolation("username", err))
 	}
 
-	if err :=  val.ValidateEmail(req.GetEmail()); err != nil {
-		violations = append(violations, fieldViolation("email", err)) 
+	if err := val.ValidateEmail(req.GetEmail()); err != nil {
+		violations = append(violations, fieldViolation("email", err))
 	}
 
-	if err :=  val.ValidateFullName(req.GetFullName()); err != nil {
-		violations = append(violations, fieldViolation("full_name", err)) 
+	if err := val.ValidateFullName(req.GetFullName()); err != nil {
+		violations = append(violations, fieldViolation("full_name", err))
 	}
 
-	if err :=  val.ValidateUsername(req.GetPassword()); err != nil {
-		violations = append(violations, fieldViolation("password", err)) 
+	if err := val.ValidateUsername(req.GetPassword()); err != nil {
+		violations = append(violations, fieldViolation("password", err))
 	}
 	return
 }
