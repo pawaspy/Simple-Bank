@@ -13,6 +13,7 @@ type Config struct {
 	HTTPAddress          string        `mapstructure:"HTTP_ADDRESS"`
 	GRPCAddress          string        `mapstructure:"GRPC_ADDRESS"`
 	TokenSymmetricKey    string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	RedisAddress         string        `mapstructure:"REDIS_ADDRESS"`
 	TokenDuration        time.Duration `mapstructure:"TOKEN_DURATION"`
 	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
