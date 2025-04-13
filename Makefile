@@ -4,7 +4,7 @@ postgres:
 	docker run --name postgres12 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -d postgres:12-alpine
 
 stop:
-	docker stop postgres
+	docker stop postgres12
 
 createdb:
 	docker exec -it postgres12 createdb --username=root --owner=root simple_bank
@@ -52,5 +52,5 @@ evans:
 
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7-alpine
-	
+
 .PHONY: postgres createdb dropdb migrateup migratedown migrateup1 migratedown1 sqlc test server mock db_docs db_schema proto evans stop redis
