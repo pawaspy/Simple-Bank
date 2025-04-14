@@ -45,7 +45,7 @@ func ValidatePassword(value string) error {
 	return nil
 }
 
-func ValidateEmail(value string) error{
+func ValidateEmail(value string) error {
 	if err := ValidateString(value, 3, 100); err != nil {
 		return err
 	}
@@ -53,4 +53,16 @@ func ValidateEmail(value string) error{
 		return err
 	}
 	return nil
+}
+
+func ValidateEmailID(value int64) error {
+	if value <= 0 {
+		return fmt.Errorf("must be positive integer")
+	}
+
+	return nil
+}
+
+func ValidateSecretCode(value string) error {
+	return ValidateString(value, 32, 128)
 }

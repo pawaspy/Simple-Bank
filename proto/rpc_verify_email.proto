@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option go_package = "github.com/pawaspy/simple_bank/pb";
+
+message CreateVerifyEmailRequest {
+    int64 email_id = 1;
+    string secret_code = 2;
+}
+
+message CreateVerifyEmailResponse {
+    bool is_verified = 1;
+}
