@@ -20,6 +20,7 @@ import (
 	"github.com/pawaspy/simple_bank/api"
 	db "github.com/pawaspy/simple_bank/db/sqlc"
 	"github.com/pawaspy/simple_bank/gapi"
+	"github.com/pawaspy/simple_bank/mail"
 	"github.com/pawaspy/simple_bank/pb"
 	"github.com/pawaspy/simple_bank/util"
 	"github.com/pawaspy/simple_bank/worker"
@@ -49,13 +50,14 @@ func main() {
 	}
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
-	go runTaskProcessor(redisOpt, store)
+	go runTaskProcessor(config, redisOpt, store)
 	go runGatewayServer(config, taskDistributor, store)
 	runGrpcServer(config, taskDistributor, store)
 }
 
-func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
 	log.Info().Msg("start task processor")
 	err := taskProcessor.Start()
 	if err != nil {
