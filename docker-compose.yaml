@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   postgres:
     image: postgres:12-alpine
@@ -10,12 +8,27 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - data-volume: /var/lib/postgresql/data
+      - data-volume:/var/lib/postgresql/data
     networks:
       - simplebank-net
     
   redis:
     image: redis:7-alpine
+    networks:
+      - simplebank-net
+  
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./db/migration:/migrations
+    depends_on:
+      - postgres
+    command:
+      [
+        "-path", "/migrations",
+        "-database", "postgresql://root:secret@postgres:5432/simple_bank?sslmode=disable",
+        "up"
+      ]
     networks:
       - simplebank-net
 
