@@ -8,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - data-volume:/var/lib/postgresql/data
+      - simplebank-pgdata:/var/lib/postgresql/data
     networks:
       - simplebank-net
     
@@ -46,4 +46,4 @@ services:
 networks:
   simplebank-net:
 volumes:
-  data-volume:
+  simplebank-pgdata:
