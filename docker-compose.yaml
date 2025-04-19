@@ -17,21 +17,6 @@ services:
     networks:
       - simplebank-net
   
-  migrate:
-    image: migrate/migrate
-    volumes:
-      - ./db/migration:/migrations
-    depends_on:
-      - postgres
-    command:
-      [
-        "-path", "/migrations",
-        "-database", "postgresql://root:secret@postgres:5432/simple_bank?sslmode=disable",
-        "up"
-      ]
-    networks:
-      - simplebank-net
-
   api:
     build:
       context: .
