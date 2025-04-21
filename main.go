@@ -116,6 +116,30 @@ func runGatewayServer(config util.Config, taskDistributor worker.TaskDistributor
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
 
+	// c := cors.New(cors.Options{
+	// 	AllowedOrigins: config.AllowedOrigins,
+	// 	AllowedMethods: []string{
+	// 		http.MethodHead,
+	// 		http.MethodOptions,
+	// 		http.MethodGet,
+	// 		http.MethodPost,
+	// 		http.MethodPut,
+	// 		http.MethodPatch,
+	// 		http.MethodDelete,
+	// 	},
+	// 	AllowedHeaders: []string{
+	// 		"Content-Type",
+	// 		"Authorization",
+	// 	},
+	// 	AllowCredentials: true,
+	// })
+	// handler := c.Handler(gapi.HttpLogger(mux))
+
+	// httpServer := &http.Server{
+	// 	Handler: handler,
+	// 	Addr:    config.HTTPServerAddress,
+	// }
+
 	fs := http.FileServer(http.Dir("./docs/swagger"))
 	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
 
