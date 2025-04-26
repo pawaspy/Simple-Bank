@@ -40,7 +40,7 @@ func main() {
 	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 
 	if err != nil {
-		log.Info().Msg("Cannot connect to db: ")
+		log.Info().Msg("Cannot connect to db")
 	}
 
 	store := db.NewStore(connPool)
